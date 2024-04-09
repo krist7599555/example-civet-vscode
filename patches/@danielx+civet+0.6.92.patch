@@ -1,0 +1,14 @@
+diff --git a/node_modules/@danielx/civet/package.json b/node_modules/@danielx/civet/package.json
+index b3a33df..622615e 100644
+--- a/node_modules/@danielx/civet/package.json
++++ b/node_modules/@danielx/civet/package.json
+@@ -8,7 +8,8 @@
+   "exports": {
+     ".": {
+       "import": "./dist/main.mjs",
+-      "require": "./dist/main.js"
++      "require": "./dist/main.js",
++      "types": "./dist/types.d.ts"
+     },
+     "./babel-plugin": "./dist/babel-plugin.mjs",
+     "./bun-civet": "./dist/bun-civet.mjs",

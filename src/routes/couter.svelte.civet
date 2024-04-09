@@ -1,0 +1,7 @@
+export function createCounter()
+  count .= $state<number>(0)
+  inc := () => count += 1;
+  return {
+    inc,
+    get count() count
+  }
