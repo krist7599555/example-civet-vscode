@@ -1,0 +1,9 @@
+export funny_sequence := (num: number) =>
+  res: number[] .= []
+  while num > 1
+    res.push num
+    num = num % 3 == 0 ? num / 3 : num % 3 == 1 ? num - 1 : num + 2
+  res ++ [1]
+
+export add_extension := <T extends string, Ext extends string>(name: T, ext: Ext) =>
+  `${name}.${ext}` as const

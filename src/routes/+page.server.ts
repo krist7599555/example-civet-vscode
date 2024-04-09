@@ -1,5 +1,1 @@
-export const load = async () => {
-  return {
-    name: "server",
-  };
-};
+export * from "./_page.server.civet";
