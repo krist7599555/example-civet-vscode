@@ -67,12 +67,6 @@ export function civet() {
       const abs_id = id2absPath(id, { ssr: opt?.ssr });
       if (!abs_id) return;
 
-      // if (id.endsWith(EXT_CIVET)) {
-      //   const civet_id = abs_id.replace(EXT_CIVET, EXT_VIRTUAL_CIVET);
-      //   return {
-      //     code: `export * from "./${civet_id.split("/").at(-1)}";`,
-      //   };
-      // }
       if (id.endsWith(EXT_CIVET)) {
         const civet_id = abs_id.replace(EXT_CIVET, EXT_CIVET);
         if (exists(civet_id)) {
@@ -102,7 +96,6 @@ export function civet() {
     },
     handleHotUpdate(ctx) {
       if (ctx.file.endsWith(".civet")) {
-        // console.log("RELOAD", ctx.file);
         // ctx.server.config.logger("[civet-full-reload] " + ctx.file);
         ctx.server.hot.send({ type: "full-reload" });
       }
