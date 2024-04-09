@@ -1,0 +1,7 @@
+{ sequence } from '@sveltejs/kit/hooks'
+
+export handle := sequence
+  async ({ event, resolve }) =>
+    console.log("HOOK2")
+    resolve(event)
+

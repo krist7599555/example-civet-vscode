@@ -1,8 +1,8 @@
-export function createCounter()
+export createCounter := =>
   count .= $state<number>(0)
   inc := () => count += 1;
   return {
-    inc,
+    inc
     get count() count
     get fizz()
       [count % 3 == 0 ? 'Fizz' : '', count % 5 == 0 ? 'Buzz' : ''].join('')

@@ -1,0 +1,8 @@
+{ json } from '@sveltejs/kit'
+
+export GET := async () => 
+  json
+    date: new Date().getTime(),
+    name: "krist"
+  
+

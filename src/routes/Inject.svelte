@@ -1,4 +1,5 @@
 <script lang="civet">
+// @ts-nocheck
 { funny_sequence } from "../lib/sequence.civet"
 { onMount } from svelte
 

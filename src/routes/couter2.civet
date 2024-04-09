@@ -1,2 +1,1 @@
-import { createCounter } from './couter.svelte.civet'
-export { createCounter }
+export { createCounter } from './couter.svelte.civet'

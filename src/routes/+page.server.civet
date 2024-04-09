@@ -1,0 +1,6 @@
+export load := async =>
+  return
+    name: "server"
+    data: [1,2,3,"cat"] as const
+    size:
+      big: "BIG" as const

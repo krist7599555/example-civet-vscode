@@ -37,42 +37,77 @@ function id2absPath(
   return undefined;
 }
 
+function toShadowPath(id: string) {
+  return id.replace(process.cwd(), path.resolve(process.cwd(), "./.shadow"));
+}
+
 export function civet() {
+  const EXT_CIVET = ".civet";
+  // const EXT_VIRTUAL_CIVET = ".ts?civet";
+  // const EXT_VIRTUAL_CIVET = ".civet";
+
+  /**
+   * {@see https://github.dev/sveltejs/kit/blob/f80ba75dfd967fb9d28d705d6891933bab603dc9/packages/kit/src/exports/vite/index.js}
+   */
   return {
     name: "vite-plugin-civet",
     enforce: "pre",
 
     async resolveId(source, importer, opt) {
-      if (source.endsWith(".civet")) {
-        const out = id2absPath(source, { importer, ssr: opt.ssr });
-        if (!out) return;
-        return out.replace(".civet", ".ts?civet");
+      const out = id2absPath(source, { importer, ssr: opt.ssr });
+      if (!out) return;
+      if (source.endsWith(EXT_CIVET)) {
+        return out.replace(EXT_CIVET, EXT_CIVET);
       }
+      // if (source.endsWith(EXT_VIRTUAL_CIVET)) {
+      //   return out.replace(EXT_VIRTUAL_CIVET, EXT_VIRTUAL_CIVET);
+      // }
     },
     async load(id, opt) {
-      if (id.endsWith(".ts?civet")) {
-        const abs_id = id2absPath(id, { ssr: opt?.ssr });
-        if (!abs_id) return;
-        const civet_id = abs_id.replace(".ts?civet", ".civet");
+      const abs_id = id2absPath(id, { ssr: opt?.ssr });
+      if (!abs_id) return;
+
+      // if (id.endsWith(EXT_CIVET)) {
+      //   const civet_id = abs_id.replace(EXT_CIVET, EXT_VIRTUAL_CIVET);
+      //   return {
+      //     code: `export * from "./${civet_id.split("/").at(-1)}";`,
+      //   };
+      // }
+      if (id.endsWith(EXT_CIVET)) {
+        const civet_id = abs_id.replace(EXT_CIVET, EXT_CIVET);
         if (exists(civet_id)) {
           const code = fs.readFileSync(civet_id, { encoding: "utf-8" });
+          const shadow = /\+page|\+layout|\+server/.test(civet_id)
+            ? civet_id.replace(EXT_CIVET, ".d.ts")
+            : toShadowPath(civet_id).replace(EXT_CIVET, ".civet.d.ts");
+
           await $`bunx civet -c ${civet_id} --output "/dev/null" --emit-declaration`;
-          const { code: ts_code, sourceMap } = compile(code, {
-            js: false,
-            sourceMap: true,
-          });
-          return { code: ts_code, map: sourceMap as any };
+          await $`mkdir -p ${path.dirname(shadow)}`;
+          await $`mv ${civet_id + ".d.ts"} ${shadow}`;
+
+          return { code };
         }
       }
     },
-    handleHotUpdate(ctx) {
-      if (ctx.file.endsWith(".ts?civet")) {
-        console.log("RELOAD", ctx.file);
-        ctx.server.config.logger("[civet-full-reload] " + ctx.file);
-        ctx.server.hot.send({
-          type: "full-reload",
+    transform(code, id) {
+      if (id.endsWith(EXT_CIVET)) {
+        const { code: ts_code, sourceMap } = compile(code, {
+          js: true,
+          sourceMap: true,
         });
+        return {
+          code: ts_code,
+        };
       }
     },
+    handleHotUpdate(ctx) {
+      if (ctx.file.endsWith(".civet")) {
+        // console.log("RELOAD", ctx.file);
+        // ctx.server.config.logger("[civet-full-reload] " + ctx.file);
+        ctx.server.hot.send({ type: "full-reload" });
+      }
+    },
+    // https://vitejs.dev/guide/api-plugin.html#configureserver
+    configureServer() {},
   } satisfies Plugin;
 }
